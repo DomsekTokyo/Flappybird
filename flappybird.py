@@ -1,6 +1,15 @@
 from pygame import *
 init()
 
+class Bird:
+    def __init__(self):
+        pass
+
+
+class Game:
+    def __init__(self):
+        pass
+
 
 
 width = 900
