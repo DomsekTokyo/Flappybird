@@ -1,4 +1,5 @@
 from pygame import *
+import random
 init()
 
 class Bird:
@@ -15,13 +16,14 @@ class Game:
         self.pipes = []
 
         self.image_pipe_down = image.load("image_trubka.png")
-        self.image_pipe_down = transform.smoothscale(self.image_pipe_down, (400, 400)).convert_alpha()
+        self.image_pipe_down = transform.smoothscale(self.image_pipe_down, (400, 800)).convert_alpha()
+        #ta nahore ktera je smerem dolu
         self.image_pipe_up = transform.rotate(self.image_pipe_down, 180)
 
         self.image_back = image.load("image1.jpg")
         self.image_back = transform.scale(self.image_back, (width, height)).convert()
 
-        self.trubky_vytvoreni()
+        self.trubky_vytvoreni(height+400)
 
     def update(self):
         self.pozadi()
@@ -34,7 +36,9 @@ class Game:
             self.mili_count = 0
         if self.count == 5:
             self.count = 0
-            self.trubky_vytvoreni()
+            height1 = random.randint(height+200, height + 500)
+
+            self.trubky_vytvoreni(height1)
 
         new_pipes = []
         for image, rect in self.pipes:
@@ -44,12 +48,14 @@ class Game:
                 okno.blit(image, rect)
         self.pipes = new_pipes
 
-    def trubky_vytvoreni(self):
+    def trubky_vytvoreni(self, height1):
+        #ta horni smerem dolu
         image_pipe_rect_down = self.image_pipe_down.get_rect()
-        image_pipe_rect_down.bottomright = (width + 300, height)
+        #prevedolni strana
+        image_pipe_rect_down.bottomright = (width + 300, height1)
 
         image_pipe_rect_up = self.image_pipe_up.get_rect()
-        image_pipe_rect_up.topright = (width + 300, -100)
+        image_pipe_rect_up.topright = (width + 300, -400)
 
         self.pipes.append((self.image_pipe_down.copy(), image_pipe_rect_down))
         self.pipes.append((self.image_pipe_up.copy(), image_pipe_rect_up))
