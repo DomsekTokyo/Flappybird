@@ -1,5 +1,6 @@
 from pygame import *
 import random
+import math
 init()
 
 class Bird:
@@ -14,7 +15,7 @@ class Game:
         self.count = 0
         self.mili_count = 0
         self.pipes = []
-
+        self.difficult = 2
         self.image_pipe_down = image.load("image_trubka.png")
         self.image_pipe_down = transform.smoothscale(self.image_pipe_down, (400, 800)).convert_alpha()
         #ta nahore ktera je smerem dolu
@@ -30,7 +31,7 @@ class Game:
         self.trubky_pohyb()
 
     def trubky_pohyb(self):
-        self.mili_count += 3
+        self.mili_count += 2
         if self.mili_count > fps:
             self.count += 1
             self.mili_count = 0
@@ -55,7 +56,7 @@ class Game:
         image_pipe_rect_down.bottomright = (width + 300, height1)
 
         image_pipe_rect_up = self.image_pipe_up.get_rect()
-        image_pipe_rect_up.topright = (width + 300, -400)
+        image_pipe_rect_up.bottomright= (width + 300, height1 - height)
 
         self.pipes.append((self.image_pipe_down.copy(), image_pipe_rect_down))
         self.pipes.append((self.image_pipe_up.copy(), image_pipe_rect_up))
