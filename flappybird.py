@@ -60,7 +60,7 @@ class Game:
 
         self.pipes.append((self.image_pipe_down.copy(), image_pipe_rect_down))
         self.pipes.append((self.image_pipe_up.copy(), image_pipe_rect_up))
-
+    #xd
     def pozadi(self):
         okno.blit(self.image_back, (0, 0))
         draw.rect(okno, (0, 255, 0), (0, height - 100, width, 80))
