@@ -80,15 +80,15 @@ class Game:
             okno.blit(pipe['down'], pipe['rect_down'])
             okno.blit(pipe['up'], pipe['rect_up'])
 
-            # Vypočítej střed svislé osy trubek (páru)
+
             pipe_center_x = pipe['rect_down'].left + pipe['rect_down'].width // 2
 
-            # Pokud pták projde touto osou a ještě se to nepočítalo
+
             if not pipe['passed'] and self.ptak.obrazek_rect.centerx > pipe_center_x:
                 pipe['passed'] = True
                 self.score += 1
 
-            # Odstraň trubky, které už jsou mimo obrazovku vlevo
+
             if pipe['rect_down'].right > 0:
                 new_pipes.append(pipe)
 
