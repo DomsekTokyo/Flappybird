@@ -31,23 +31,24 @@ class Bird:
 
 
 
-
 class Game:
     def __init__(self, ptak):
+        self.score = 0
         self.pohyb = 3
-        self.count = 0
-        self.mili_count = 0
         self.pipes = []
-        self.difficult = 2
+        self.black = (0, 0, 0)
+        self.font = font.SysFont("Arial", 30)
+        self.ptak = ptak
+
         self.image_pipe_down = image.load("image_trubka.png")
         self.image_pipe_down = transform.smoothscale(self.image_pipe_down, (400, 800)).convert_alpha()
-        #ta nahore ktera je smerem dolu
         self.image_pipe_up = transform.rotate(self.image_pipe_down, 180)
-        self.ptak = ptak
+
         self.image_back = image.load("image1.jpg")
         self.image_back = transform.scale(self.image_back, (width, height)).convert()
 
-        self.trubky_vytvoreni(height+400)
+        self.spawn_timer = 100
+        self.spawn_interval = 150
 
     def update(self):
         self.pozadi()
@@ -55,42 +56,53 @@ class Game:
         self.ptak.pohyb()
         okno.blit(self.ptak.obrazek, self.ptak.obrazek_rect)
 
+        text = self.font.render(f"Skóre: {self.score}", True, self.black)
+        okno.blit(text, (20, 20))
 
     def trubky_pohyb(self):
-        self.mili_count += 2
-        if self.mili_count > fps:
-            self.count += 1
-            self.mili_count = 0
-        if self.count == 5:
-            self.count = 0
-            height1 = random.randint(height+200, height + 500)
-
-            self.trubky_vytvoreni(height1)
+        self.spawn_timer += 1
+        if self.spawn_timer >= self.spawn_interval:
+            self.spawn_timer = 0
+            height1 = random.randint(height + 200, height + 500)
+            self.pipes.append({
+                'down': self.image_pipe_down.copy(),
+                'up': self.image_pipe_up.copy(),
+                'rect_down': self.image_pipe_down.get_rect(bottomright=(width + 300, height1)),
+                'rect_up': self.image_pipe_up.get_rect(bottomright=(width + 300, height1 - height)),
+                'passed': False
+            })
 
         new_pipes = []
-        for image, rect in self.pipes:
-            rect.left -= self.pohyb
-            if rect.right > 0:
-                new_pipes.append((image, rect))
-                okno.blit(image, rect)
+        for pipe in self.pipes:
+            pipe['rect_down'].left -= self.pohyb
+            pipe['rect_up'].left -= self.pohyb
+
+            okno.blit(pipe['down'], pipe['rect_down'])
+            okno.blit(pipe['up'], pipe['rect_up'])
+
+            # Vypočítej střed svislé osy trubek (páru)
+            pipe_center_x = pipe['rect_down'].left + pipe['rect_down'].width // 2
+
+            # Pokud pták projde touto osou a ještě se to nepočítalo
+            if not pipe['passed'] and self.ptak.obrazek_rect.centerx > pipe_center_x:
+                pipe['passed'] = True
+                self.score += 1
+
+            # Odstraň trubky, které už jsou mimo obrazovku vlevo
+            if pipe['rect_down'].right > 0:
+                new_pipes.append(pipe)
+
         self.pipes = new_pipes
 
-    def trubky_vytvoreni(self, height1):
-        #ta horni smerem dolu
-        image_pipe_rect_down = self.image_pipe_down.get_rect()
-        #prevedolni strana
-        image_pipe_rect_down.bottomright = (width + 300, height1)
-
-        image_pipe_rect_up = self.image_pipe_up.get_rect()
-        image_pipe_rect_up.bottomright= (width + 300, height1 - height)
-
-        self.pipes.append((self.image_pipe_down.copy(), image_pipe_rect_down))
-        self.pipes.append((self.image_pipe_up.copy(), image_pipe_rect_up))
-    #xd
     def pozadi(self):
         okno.blit(self.image_back, (0, 0))
         draw.rect(okno, (0, 255, 0), (0, height - 100, width, 80))
         draw.rect(okno, (181, 101, 29), (0, height - 30, width, 100))
+
+
+
+
+
 
 
 
