@@ -1,16 +1,39 @@
 from pygame import *
 import random
-import math
+
 init()
 
 class Bird:
     def __init__(self):
-        pass
+        self.pohybek = 3
+        self.mili_count = 0
+        self.count = 0
+
+        self.obrazek = image.load("ptak.png")
+        self.obrazek_rect = self.obrazek.get_rect()
+        self.obrazek_rect.center = (100, height // 2)
+
+        self.rychlost = 0
+        self.gravitace = 0.5
+        self.skok_sila = -10
+
+    def pohyb(self):
+        self.rychlost += self.gravitace  # gravitace přidává akceleraci do rychlosti
+        self.obrazek_rect.top += int(self.rychlost)  # rychlost pak posune ptáka
+
+
+
+    def skok(self):
+        self.rychlost = self.skok_sila
+
+
+
+
 
 
 
 class Game:
-    def __init__(self):
+    def __init__(self, ptak):
         self.pohyb = 3
         self.count = 0
         self.mili_count = 0
@@ -20,7 +43,7 @@ class Game:
         self.image_pipe_down = transform.smoothscale(self.image_pipe_down, (400, 800)).convert_alpha()
         #ta nahore ktera je smerem dolu
         self.image_pipe_up = transform.rotate(self.image_pipe_down, 180)
-
+        self.ptak = ptak
         self.image_back = image.load("image1.jpg")
         self.image_back = transform.scale(self.image_back, (width, height)).convert()
 
@@ -29,6 +52,9 @@ class Game:
     def update(self):
         self.pozadi()
         self.trubky_pohyb()
+        self.ptak.pohyb()
+        okno.blit(self.ptak.obrazek, self.ptak.obrazek_rect)
+
 
     def trubky_pohyb(self):
         self.mili_count += 2
@@ -77,7 +103,8 @@ height = 800
 okno = display.set_mode((width, height))
 display.set_caption("Happy Bird")
 
-hra = Game()
+ptak = Bird()
+hra = Game(ptak)
 
 fps = 60
 time = time.Clock()
@@ -88,6 +115,8 @@ while yes:
     for a in event.get():
         if a.type == QUIT:
             yes = False
+        if a.type == KEYDOWN and a.key == K_SPACE:
+            ptak.skok()
 
 
     hra.update()
