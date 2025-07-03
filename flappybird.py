@@ -74,7 +74,7 @@ class Game:
                     self.ptak.obrazek_rect.bottom = height - 80
                     self.ptak.rychlost = 0
 
-
+    #blabla
 
     def trubky_pohyb(self):
         if self.pause:
