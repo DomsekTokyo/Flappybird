@@ -3,33 +3,28 @@ import random
 
 init()
 
+width = 900
+height = 800
+okno = display.set_mode((width, height))
+display.set_caption("Happy Bird")
+
 class Bird:
     def __init__(self):
-        self.pohybek = 3
-        self.mili_count = 0
-        self.count = 0
-
+        self.rychlost = 0
+        self.gravitace = 0.5
+        self.skok_sila = -10
+        self.skok2 = True
         self.obrazek = image.load("ptak.png")
         self.obrazek_rect = self.obrazek.get_rect()
         self.obrazek_rect.center = (100, height // 2)
 
-        self.rychlost = 0
-        self.gravitace = 0.5
-        self.skok_sila = -10
-
     def pohyb(self):
-        self.rychlost += self.gravitace  # gravitace přidává akceleraci do rychlosti
-        self.obrazek_rect.top += int(self.rychlost)  # rychlost pak posune ptáka
-
-
+        self.rychlost += self.gravitace
+        self.obrazek_rect.top += int(self.rychlost)
 
     def skok(self):
-        self.rychlost = self.skok_sila
-
-
-
-
-
+        if self.skok2:
+            self.rychlost = self.skok_sila
 
 class Game:
     def __init__(self, ptak):
@@ -38,7 +33,9 @@ class Game:
         self.pipes = []
         self.black = (0, 0, 0)
         self.font = font.SysFont("Arial", 30)
+        self.biggerfont = font.SysFont("Arial", 60)
         self.ptak = ptak
+        self.pause = False
 
         self.image_pipe_down = image.load("image_trubka.png")
         self.image_pipe_down = transform.smoothscale(self.image_pipe_down, (400, 800)).convert_alpha()
@@ -52,14 +49,38 @@ class Game:
 
     def update(self):
         self.pozadi()
-        self.trubky_pohyb()
-        self.ptak.pohyb()
         okno.blit(self.ptak.obrazek, self.ptak.obrazek_rect)
-
         text = self.font.render(f"Skóre: {self.score}", True, self.black)
         okno.blit(text, (20, 20))
 
+
+
+        if not self.pause:
+            self.trubky_pohyb()
+            self.vykresli_trubky()
+            self.ptak.pohyb()
+
+        else:
+            text = self.biggerfont.render("Hra skončila", True, self.black)
+            textr = text.get_rect()
+            textr.center = (width // 2, height // 2)
+            okno.blit(text, textr)
+            self.ptak.skok2 = False
+            self.vykresli_trubky()
+            if self.ptak.obrazek_rect.bottom < height - 80:
+                self.ptak.rychlost += self.ptak.gravitace
+                self.ptak.obrazek_rect.top += int(self.ptak.rychlost)
+                if self.ptak.obrazek_rect.bottom > height - 80:
+                    self.ptak.obrazek_rect.bottom = height - 80
+                    self.ptak.rychlost = 0
+
+
+
     def trubky_pohyb(self):
+        if self.pause:
+
+            return
+
         self.spawn_timer += 1
         if self.spawn_timer >= self.spawn_interval:
             self.spawn_timer = 0
@@ -77,61 +98,53 @@ class Game:
             pipe['rect_down'].left -= self.pohyb
             pipe['rect_up'].left -= self.pohyb
 
-            okno.blit(pipe['down'], pipe['rect_down'])
-            okno.blit(pipe['up'], pipe['rect_up'])
+            kolizni_rect_down = pipe['rect_down'].inflate(-260, -260)
+            kolizni_rect_up = pipe['rect_up'].inflate(-260, -260)
 
+            if self.ptak.obrazek_rect.colliderect(kolizni_rect_up) or self.ptak.obrazek_rect.colliderect(kolizni_rect_down):
+                self.smrt()
+                break
 
             pipe_center_x = pipe['rect_down'].left + pipe['rect_down'].width // 2
-
-
             if not pipe['passed'] and self.ptak.obrazek_rect.centerx > pipe_center_x:
                 pipe['passed'] = True
                 self.score += 1
-
 
             if pipe['rect_down'].right > 0:
                 new_pipes.append(pipe)
 
         self.pipes = new_pipes
 
+    def vykresli_trubky(self):
+        for pipe in self.pipes:
+            okno.blit(pipe['down'], pipe['rect_down'])
+            okno.blit(pipe['up'], pipe['rect_up'])
+
     def pozadi(self):
         okno.blit(self.image_back, (0, 0))
         draw.rect(okno, (0, 255, 0), (0, height - 100, width, 80))
         draw.rect(okno, (181, 101, 29), (0, height - 30, width, 100))
 
+    def smrt(self):
 
-
-
-
-
-
-
-class Menu:
-    def __init__(self):
-        pass
-
-width = 900
-height = 800
-okno = display.set_mode((width, height))
-display.set_caption("Happy Bird")
+        self.pause = True
 
 ptak = Bird()
 hra = Game(ptak)
 
 fps = 60
-time = time.Clock()
+clock = time.Clock()
 
-
-yes = True
-while yes:
-    for a in event.get():
-        if a.type == QUIT:
-            yes = False
-        if a.type == KEYDOWN and a.key == K_SPACE:
+running = True
+while running:
+    for e in event.get():
+        if e.type == QUIT:
+            running = False
+        if e.type == KEYDOWN and e.key == K_SPACE:
             ptak.skok()
-
 
     hra.update()
     display.update()
-    time.tick(fps)
+    clock.tick(fps)
+
 quit()
