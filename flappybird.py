@@ -26,6 +26,7 @@ class Bird:
         if self.skok2:
             self.rychlost = self.skok_sila
 
+
 class Game:
     def __init__(self, ptak):
         self.score = 0
@@ -47,6 +48,16 @@ class Game:
         self.spawn_timer = 100
         self.spawn_interval = 150
 
+
+
+    def kolize_Podlaha(self):
+        if self.ptak.obrazek_rect.bottom > height - 100:
+            self.smrt()
+    def kolize_Strop(self):
+        if self.ptak.obrazek_rect.top < 0:
+            self.ptak.obrazek_rect.top = 0
+            self.ptak.rychlost = 0
+
     def update(self):
         self.pozadi()
         okno.blit(self.ptak.obrazek, self.ptak.obrazek_rect)
@@ -59,6 +70,8 @@ class Game:
             self.trubky_pohyb()
             self.vykresli_trubky()
             self.ptak.pohyb()
+            self.kolize_Podlaha()
+            self.kolize_Strop()
 
         else:
             text = self.biggerfont.render("Hra skončila", True, self.black)
@@ -129,22 +142,53 @@ class Game:
 
         self.pause = True
 
+    def zacatek(self):
+        self.pozadi()
+        zacatek = self.biggerfont.render("Stisknutím mezerníku hru začnete", True, self.black)
+        textr = zacatek.get_rect()
+        textr.center = (width // 2, height // 2)
+        okno.blit(zacatek, textr)
+    def start(self):
+        # reset ptáka
+        self.ptak.obrazek_rect.center = (100, height // 2)
+        self.ptak.rychlost = 0
+        self.ptak.skok2 = True
+        # reset trubek
+        self.pipes = []
+        self.spawn_timer = 100
+        # reset skóre a pauza
+        self.score = 0
+        self.pause = False
+
+
+
 ptak = Bird()
 hra = Game(ptak)
 
 fps = 60
 clock = time.Clock()
-
+hra_zacala = False
 running = True
 while running:
     for e in event.get():
         if e.type == QUIT:
             running = False
         if e.type == KEYDOWN and e.key == K_SPACE:
-            ptak.skok()
+            if not hra_zacala:
+                hra.start()
+                hra_zacala = True
+            else:
+                hra.ptak.skok()
+    if not hra_zacala:
+        hra.zacatek()
+    else:
 
-    hra.update()
+        hra.update()
+
     display.update()
     clock.tick(fps)
 
 quit()
+
+
+
