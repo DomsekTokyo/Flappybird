@@ -1,6 +1,7 @@
 from pygame import *
 import random
 
+
 init()
 
 width = 900
@@ -60,10 +61,9 @@ class Game:
 
     def update(self):
         self.pozadi()
-        okno.blit(self.ptak.obrazek, self.ptak.obrazek_rect)
-        text = self.font.render(f"Skóre: {self.score}", True, self.black)
-        okno.blit(text, (20, 20))
 
+
+        okno.blit(self.ptak.obrazek, self.ptak.obrazek_rect)
 
 
         if not self.pause:
@@ -72,20 +72,37 @@ class Game:
             self.ptak.pohyb()
             self.kolize_Podlaha()
             self.kolize_Strop()
+            # Černý text s modrým pozadím
+            text = self.font.render(f"Skóre: {self.score}", True, (0, 0, 0), (135, 206, 250))
+            okno.blit(text, (20, 20))
+
+            okno.blit(text, (20, 20))
 
         else:
             text = self.biggerfont.render("Hra skončila", True, self.black)
+            text2 = self.biggerfont.render("Stiskněte mezerník pro pokračování", True, self.black)
+
             textr = text.get_rect()
             textr.center = (width // 2, height // 2)
+
+            textr2 =  text2.get_rect()
+            textr2.center = (width // 2, height // 2 + 100)
+
             okno.blit(text, textr)
+            okno.blit(text2, textr2)
             self.ptak.skok2 = False
             self.vykresli_trubky()
+
             if self.ptak.obrazek_rect.bottom < height - 80:
                 self.ptak.rychlost += self.ptak.gravitace
                 self.ptak.obrazek_rect.top += int(self.ptak.rychlost)
                 if self.ptak.obrazek_rect.bottom > height - 80:
                     self.ptak.obrazek_rect.bottom = height - 80
                     self.ptak.rychlost = 0
+
+
+
+
 
     #blabla
 
@@ -134,9 +151,11 @@ class Game:
             okno.blit(pipe['up'], pipe['rect_up'])
 
     def pozadi(self):
+
         okno.blit(self.image_back, (0, 0))
         draw.rect(okno, (0, 255, 0), (0, height - 100, width, 80))
         draw.rect(okno, (181, 101, 29), (0, height - 30, width, 100))
+
 
     def smrt(self):
 
@@ -177,6 +196,8 @@ while running:
             if not hra_zacala:
                 hra.start()
                 hra_zacala = True
+            elif hra.pause:
+                hra.start()
             else:
                 hra.ptak.skok()
     if not hra_zacala:
