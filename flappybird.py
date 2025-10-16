@@ -220,7 +220,7 @@ while running:
     for e in event.get():
         if e.type == QUIT:
             running = False
-        if e.type == KEYDOWN and e.key == K_SPACE:
+        if e.type == KEYDOWN and e.key == K_SPACE or e.key == MOUSEBUTTONDOWN:
             if not hra_zacala:
                 hra.start()
                 hra_zacala = True
