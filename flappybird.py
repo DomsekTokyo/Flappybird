@@ -2,8 +2,10 @@ import time
 
 from pygame import *
 import random
-
-
+mixer.init()
+mixer.music.load("puzzle.mp3")
+mixer.music.set_volume(0.05)
+mixer.music.play(-1)
 
 init()
 
@@ -52,6 +54,14 @@ class Game:
         self.spawn_timer = 100
         self.spawn_interval = 150
 
+        self.imagegrass = image.load("Vrstva 1.png")
+        self.imagegrass = transform.scale(self.imagegrass, (1000, 100))
+
+
+
+
+
+
 
 
     def kolize_Podlaha(self):
@@ -79,8 +89,8 @@ class Game:
 
             text = self.font.render(f"Skóre: {self.score}", True, (0, 0, 0))
 
-            draw.rect(okno, (0, 255, 0), (11, 11, 110, 60), border_radius=10)
-            draw.rect(okno, (255, 255, 255), (10, 10, 110,60), border_radius=10, width=5)
+            draw.rect(okno, (0, 255, 0), (11, 11, 130, 60), border_radius=10)
+            draw.rect(okno, (255, 255, 255), (10, 10, 130,60), border_radius=10, width=5)
 
             okno.blit(text, (20, 20))
 
@@ -164,8 +174,12 @@ class Game:
     def pozadi(self):
 
         okno.blit(self.image_back, (0, 0))
-        draw.rect(okno, (0, 255, 0), (0, height - 100, width, 80))
-        draw.rect(okno, (181, 101, 29), (0, height - 30, width, 100))
+        okno.blit(self.imagegrass, (0, 700))
+
+
+
+
+
 
 
     def smrt(self):
