@@ -75,7 +75,7 @@ class Game:
             self.kolize_Strop()
             # Černý text s modrým pozadím
 
-            text = self.font.render(f"Skóre: {self.score}", True, (0, 0, 0) )
+            text = self.font.render(f"Skóre: {self.score}", True, (0, 0, 0))
 
             draw.rect(okno, (0, 255, 0), (11, 11, 110, 60), border_radius=10)
             draw.rect(okno, (255, 255, 255), (10, 10, 110,60), border_radius=10, width=5)
@@ -85,6 +85,7 @@ class Game:
             okno.blit(text, (20, 20))
 
         else:
+
             text = self.biggerfont.render("Hra skončila", True, self.black)
             text2 = self.biggerfont.render("Stiskněte mezerník pro pokračování", True, self.black)
 
@@ -94,11 +95,13 @@ class Game:
             textr2 =  text2.get_rect()
             textr2.center = (width // 2, height // 2 + 100)
 
-            okno.blit(text, textr)
-            okno.blit(text2, textr2)
+
             self.ptak.skok2 = False
             self.vykresli_trubky()
-
+            draw.rect(okno, (0, 255, 0), (40, 350, 820, 200), border_radius=10)
+            draw.rect(okno, (255, 255, 255), (40, 350, 820, 200), border_radius=10, width=5)
+            okno.blit(text, textr)
+            okno.blit(text2, textr2)
             if self.ptak.obrazek_rect.bottom < height - 80:
                 self.ptak.rychlost += self.ptak.gravitace
                 self.ptak.obrazek_rect.top += int(self.ptak.rychlost)
@@ -172,6 +175,8 @@ class Game:
         zacatek = self.biggerfont.render("Stisknutím mezerníku hru začnete", True, self.black)
         textr = zacatek.get_rect()
         textr.center = (width // 2, height // 2)
+        draw.rect(okno, (0, 255, 0), (40, 350, 820, 100), border_radius=10)
+        draw.rect(okno, (255, 255, 255), (40, 350, 820, 100), border_radius=10, width=5)
         okno.blit(zacatek, textr)
     def start(self):
         # reset ptáka
