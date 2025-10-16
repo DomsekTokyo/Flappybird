@@ -2,6 +2,7 @@ from pygame import *
 import random
 
 
+
 init()
 
 width = 900
@@ -73,7 +74,12 @@ class Game:
             self.kolize_Podlaha()
             self.kolize_Strop()
             # Černý text s modrým pozadím
-            text = self.font.render(f"Skóre: {self.score}", True, (0, 0, 0), (135, 206, 250))
+
+            text = self.font.render(f"Skóre: {self.score}", True, (0, 0, 0) )
+
+            draw.rect(okno, (0, 255, 0), (11, 11, 110, 60), border_radius=10)
+            draw.rect(okno, (255, 255, 255), (10, 10, 110,60), border_radius=10, width=5)
+
             okno.blit(text, (20, 20))
 
             okno.blit(text, (20, 20))
