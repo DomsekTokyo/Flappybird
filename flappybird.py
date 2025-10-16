@@ -1,3 +1,5 @@
+import time
+
 from pygame import *
 import random
 
@@ -39,7 +41,7 @@ class Game:
         self.biggerfont = font.SysFont("Arial", 60)
         self.ptak = ptak
         self.pause = False
-
+        self.czas = None
         self.image_pipe_down = image.load("image_trubka.png")
         self.image_pipe_down = transform.smoothscale(self.image_pipe_down, (400, 800)).convert_alpha()
         self.image_pipe_up = transform.rotate(self.image_pipe_down, 180)
@@ -169,6 +171,7 @@ class Game:
     def smrt(self):
 
         self.pause = True
+        self.czas = time.get_ticks()
 
     def zacatek(self):
         self.pozadi()
@@ -208,10 +211,12 @@ while running:
                 hra.start()
                 hra_zacala = True
             elif hra.pause:
-                hra.start()
+                if time.get_ticks() - hra.czas >= 1000:
+                    hra.start()
             else:
                 hra.ptak.skok()
     if not hra_zacala:
+
         hra.zacatek()
     else:
 
