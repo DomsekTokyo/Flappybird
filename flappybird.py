@@ -1,12 +1,14 @@
 import time
-
 from pygame import *
 import random
+
+# Inicializace mixeru a hudby
 mixer.init()
 mixer.music.load("puzzle.mp3")
 mixer.music.set_volume(0.05)
 mixer.music.play(-1)
 
+# Inicializace Pygame
 init()
 
 width = 900
@@ -32,7 +34,6 @@ class Bird:
         if self.skok2:
             self.rychlost = self.skok_sila
 
-
 class Game:
     def __init__(self, ptak):
         self.score = 0
@@ -44,29 +45,25 @@ class Game:
         self.ptak = ptak
         self.pause = False
         self.czas = None
-        self.image_pipe_down = image.load("image_trubka.png")
-        self.image_pipe_down = transform.smoothscale(self.image_pipe_down, (400, 800)).convert_alpha()
+
+        # Obrazky
+        self.image_pipe_down = transform.smoothscale(image.load("image_trubka.png"), (400, 800)).convert_alpha()
         self.image_pipe_up = transform.rotate(self.image_pipe_down, 180)
+        self.image_back = transform.scale(image.load("pozadi.jpg"), (width, height)).convert()
+        self.imagegrass = transform.scale(image.load("Vrstva 1.png"), (1000, 100))
 
-        self.image_back = image.load("image1.jpg")
-        self.image_back = transform.scale(self.image_back, (width, height)).convert()
-
+        # Spawn trubek
         self.spawn_timer = 100
         self.spawn_interval = 150
 
-        self.imagegrass = image.load("Vrstva 1.png")
-        self.imagegrass = transform.scale(self.imagegrass, (1000, 100))
-
-
-
-
-
-
-
+        # Volume button
+        self.pausevolume = True  # True = hudba zapnuta
+        self.volume = Rect(width-120, 20, 100, 50)
 
     def kolize_Podlaha(self):
         if self.ptak.obrazek_rect.bottom > height - 100:
             self.smrt()
+
     def kolize_Strop(self):
         if self.ptak.obrazek_rect.top < 0:
             self.ptak.obrazek_rect.top = 0
@@ -74,10 +71,10 @@ class Game:
 
     def update(self):
         self.pozadi()
-
-
         okno.blit(self.ptak.obrazek, self.ptak.obrazek_rect)
+        color = (0, 200, 0) if self.pausevolume else (200, 0, 0)
 
+        textvol = self.font.render("Volume", True, (0, 0, 0))
 
         if not self.pause:
             self.trubky_pohyb()
@@ -85,29 +82,16 @@ class Game:
             self.ptak.pohyb()
             self.kolize_Podlaha()
             self.kolize_Strop()
-            # Černý text s modrým pozadím
-
+            # Skóre
             text = self.font.render(f"Skóre: {self.score}", True, (0, 0, 0))
-
             draw.rect(okno, (0, 255, 0), (11, 11, 130, 60), border_radius=10)
-            draw.rect(okno, (255, 255, 255), (10, 10, 130,60), border_radius=10, width=5)
-
+            draw.rect(okno, (255, 255, 255), (10, 10, 130, 60), border_radius=10, width=5)
             okno.blit(text, (20, 20))
-
-            okno.blit(text, (20, 20))
-
         else:
-
             text = self.biggerfont.render("Hra skončila", True, self.black)
             text2 = self.biggerfont.render("Stiskněte mezerník pro pokračování", True, self.black)
-
-            textr = text.get_rect()
-            textr.center = (width // 2, height // 2)
-
-            textr2 =  text2.get_rect()
-            textr2.center = (width // 2, height // 2 + 100)
-
-
+            textr = text.get_rect(center=(width//2, height//2))
+            textr2 = text2.get_rect(center=(width//2, height//2 + 100))
             self.ptak.skok2 = False
             self.vykresli_trubky()
             draw.rect(okno, (0, 255, 0), (40, 350, 820, 200), border_radius=10)
@@ -120,16 +104,10 @@ class Game:
                 if self.ptak.obrazek_rect.bottom > height - 80:
                     self.ptak.obrazek_rect.bottom = height - 80
                     self.ptak.rychlost = 0
-
-
-
-
-
-    #blabla
-
+        draw.rect(okno, color, self.volume, border_radius=5)
+        okno.blit(textvol, (self.volume.x + 10, self.volume.y + 10))
     def trubky_pohyb(self):
         if self.pause:
-
             return
 
         self.spawn_timer += 1
@@ -172,43 +150,33 @@ class Game:
             okno.blit(pipe['up'], pipe['rect_up'])
 
     def pozadi(self):
-
         okno.blit(self.image_back, (0, 0))
         okno.blit(self.imagegrass, (0, 700))
 
 
 
-
-
-
-
     def smrt(self):
-
         self.pause = True
         self.czas = time.get_ticks()
 
     def zacatek(self):
         self.pozadi()
         zacatek = self.biggerfont.render("Stisknutím mezerníku hru začnete", True, self.black)
-        textr = zacatek.get_rect()
-        textr.center = (width // 2, height // 2)
+        textr = zacatek.get_rect(center=(width // 2, height // 2))
         draw.rect(okno, (0, 255, 0), (40, 350, 820, 100), border_radius=10)
         draw.rect(okno, (255, 255, 255), (40, 350, 820, 100), border_radius=10, width=5)
         okno.blit(zacatek, textr)
+
     def start(self):
-        # reset ptáka
         self.ptak.obrazek_rect.center = (100, height // 2)
         self.ptak.rychlost = 0
         self.ptak.skok2 = True
-        # reset trubek
         self.pipes = []
         self.spawn_timer = 100
-        # reset skóre a pauza
         self.score = 0
         self.pause = False
 
-
-
+# Spuštění hry
 ptak = Bird()
 hra = Game(ptak)
 
@@ -216,30 +184,30 @@ fps = 60
 clock = time.Clock()
 hra_zacala = False
 running = True
+
 while running:
     for e in event.get():
         if e.type == QUIT:
             running = False
-        if e.type == KEYDOWN and e.key == K_SPACE or e.key == MOUSEBUTTONDOWN:
+        elif e.type == MOUSEBUTTONDOWN:
+            if hra.volume.collidepoint(e.pos):
+                hra.pausevolume = not hra.pausevolume
+                mixer.music.set_volume(0.05 if hra.pausevolume else 0)
+        elif e.type == KEYDOWN and e.key == K_SPACE:
             if not hra_zacala:
                 hra.start()
                 hra_zacala = True
-            elif hra.pause:
-                if time.get_ticks() - hra.czas >= 1000:
-                    hra.start()
+            elif hra.pause and time.get_ticks() - hra.czas >= 1000:
+                hra.start()
             else:
                 hra.ptak.skok()
-    if not hra_zacala:
 
+    if not hra_zacala:
         hra.zacatek()
     else:
-
         hra.update()
 
     display.update()
     clock.tick(fps)
 
 quit()
-
-
-
