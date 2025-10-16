@@ -1,7 +1,8 @@
 import time
 from pygame import *
 import random
-
+import pygame
+import sys
 # Inicializace mixeru a hudby
 mixer.init()
 mixer.music.load("puzzle.mp3")
